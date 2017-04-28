@@ -13,6 +13,10 @@ library(riri)
 library(tidyverse)
 ```
 
+You can find the source code for the `riri` package on GitHub: https://github.com/ashiklom/riri.
+It is still in the early stages of development, so expect it to change frequently.
+I welcome comments and critiques in the issues, and, of course, pull requests!
+
 # Introduction to the IRI/LDEO library
 
 The IRI/LDEO library contains a variety of data sources, which are accessible based on specific URLs.
