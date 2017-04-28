@@ -127,6 +127,16 @@ $(document).ready(function () {
 <p>This example will use <code>riri</code> for data downloading and some pre-processing under the hood. It also uses the <code>tidyverse</code> package to facilitate post-processing and visualization of data.</p>
 <pre class="r"><code>library(riri)
 library(tidyverse)</code></pre>
+<pre><code>## Loading tidyverse: ggplot2
+## Loading tidyverse: tibble
+## Loading tidyverse: tidyr
+## Loading tidyverse: readr
+## Loading tidyverse: purrr
+## Loading tidyverse: dplyr</code></pre>
+<pre><code>## Conflicts with tidy packages ----------------------------------------------</code></pre>
+<pre><code>## filter(): dplyr, stats
+## lag():    dplyr, stats</code></pre>
+<p>You can find the source code for the <code>riri</code> package on GitHub: <a href="https://github.com/ashiklom/riri" class="uri">https://github.com/ashiklom/riri</a>. It is still in the early stages of development, so expect it to change frequently. I welcome comments and critiques in the issues, and, of course, pull requests!</p>
 </div>
 <div id="introduction-to-the-irildeo-library" class="section level1">
 <h1>Introduction to the IRI/LDEO library</h1>
@@ -192,7 +202,7 @@ mysite</code></pre>
 
 mysite_nc &lt;- ncdf4::nc_open(mysite_file)
 mysite_nc</code></pre>
-<pre><code>## File /tmp/RtmpumO734/file35393871e23e (NC_FORMAT_CLASSIC):
+<pre><code>## File /tmp/RtmpobrJn6/file7fed23fbfd91 (NC_FORMAT_CLASSIC):
 ## 
 ##      1 variables (excluding dimension variables):
 ##         float temp[X,Y,T]   
