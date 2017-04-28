@@ -3,11 +3,14 @@ Title: Helper functions for working with Columbia IRI LDEO climate data library
 Version: 0.0.0.9000
 Authors@R: person("Alexey", "Shiklomanov", email = "ashiklom@bu.edu", role = c("aut", "cre"))
 Description: Generate URLs, including filters, and download data.
-Depends: R (>= 3.4.0)
+Depends:
+    methods
 Imports:
-    ncdf4
+    ncdf4,
+    lubridate
 Suggests:
-    magrittr
+    magrittr,
+    testthat
 License: MIT License
 Encoding: UTF-8
 LazyData: true

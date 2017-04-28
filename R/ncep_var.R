@@ -8,7 +8,7 @@ ncep_var <- function(url_string, varcode) {
     }
     varlist <- switch(varcode, 
                       air_temperature = c('.GHCN_CAMS', '.gridded', '.deg0p5', '.temp'),
-                      precipitation = c('.PRECL', '.v1p0'),
+                      precipitation = c('.PRECL', '.v1p0', '.deg0p5', '.rain'),
                       soil_moisture = c('.GMSM', '.w'),
                       stop())
     output <- c(url_string, ncep_base, varlist)
