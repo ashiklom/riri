@@ -1,0 +1,200 @@
+---
+title: Loading NOEA-NCEP monthly data
+author: Alexey Shiklomanov
+---
+
+# Setup
+
+This example will use `riri` for data downloading and some pre-processing under the hood.
+It also uses the `tidyverse` package to facilitate post-processing and visualization of data.
+
+```{r}
+library(riri)
+library(tidyverse)
+```
+
+# Introduction to the IRI/LDEO library
+
+The IRI/LDEO library contains a variety of data sources, which are accessible based on specific URLs.
+The library is also capable of doing its own preprocessing of data sources, such as subsetting to specific coordinates and specific times, averaging over specific durations, and more advanced analyses like correlations and empirical orthagonal functions (EOFs).
+These analyses are applied by appropriate tags added to the end of URLs.
+
+The functions in `riri` are designed around this principle of progressively extending a string, and are therefore best understood via the `magrittr` pipe (`%>%`) operator.
+
+```{r urlexample}
+base_url()
+base_url() %>% ncep_var('air_temperature')
+base_url() %>% ncep_var('precipitation')
+base_url() %>% ncep_var('air_temperature')
+```
+
+These functions create a character vector, which is concatenated into a URL at the end by `generate_url`.
+
+```{r generateurl}
+base_url() %>% ncep_var('air_temperature') %>% generate_url()
+```
+
+These examples provide the root URLs of each dataset.
+You can browse to those URLs to confirm that they work.
+
+Although you can download a global dataset if you wish, most analyses will focus on a specific site or region.
+To filter a dataset down to a specific point, use the `filter_point` function.
+
+```{r filterpoint}
+mysite <- base_url() %>% 
+    ncep_var('air_temperature') %>% 
+    filter_point(lat = 45.67, lon = -85.553)
+mysite
+generate_url(mysite)
+```
+
+Note the resultant IRI-specific syntax.
+
+# Downloading data
+
+To actually download a netCDF file containing the data, use the `retrieve_data` function.
+
+```{r retrievedata, eval = FALSE}
+mysite %>% 
+    generate_url %>% 
+    retrieve_data
+```
+
+By default, this downloads to a temporary file.
+Optionally, you can also provide a specific file path.
+
+```{r downloadfile, eval = FALSE}
+mysite %>% 
+    generate_url %>% 
+    retrieve_data('mysite.nc')
+```
+
+The output of `retrieve_data` is the filename itself.
+
+```{r readnc}
+mysite_file <- mysite %>% 
+    generate_url %>% 
+    retrieve_data()
+
+mysite_nc <- ncdf4::nc_open(mysite_file)
+mysite_nc
+```
+
+# Preprocessing data
+
+You may deal with the resultant netCDF files on your own if you wish.
+However, `riri` includes some functions to facilitate getting the data into a workable form first.
+
+`read_nc2list` will read the contents a netCDF file into a list, with each item containing the full list of attributes.
+Here, we want to grab the variable and only the time dimension (`T`), since we are dealing with a time series at a single plot.
+
+```{r nc2list}
+mysite_list <- read_nc2list(mysite_file, dims = 'T')
+str(mysite_list)
+```
+
+A list format is convenient because, when the dimensions align, it can be easily made into a `data.frame` (or, in this case, a `tibble`).
+
+```{r tibble}
+as_data_frame(mysite_list)
+```
+
+Note that the time is in a weird format. 
+You can extract the units from the `mysite_list` via the object's `attributes`.
+
+```{r attributes}
+attributes(mysite_list[['T']])
+attr(mysite_list[['T']], 'units')
+```
+
+Months since 1960 is a weird date format.
+Fortunately, `riri` provides a conversion function that uses some `lubridate` magic to convert this to a date, and optionally drops the original `T` variable.
+
+```{r processdate}
+mysite_list2 <- process_date(mysite_list)
+str(mysite_list2)
+```
+
+# Putting it all together
+
+All of these operations can be conveneintly wrapped into a single long pipeline, which in turn can be wrapped in a function for retrieving one kind of data.
+Let's create a function for retrieving NCEP monthly temperature, called `ncep_temp`.
+
+```{r ncep_temp}
+ncep_temp <- function(lat, lon) {
+    base_url() %>% 
+        ncep_var('air_temperature') %>% 
+        filter_point(lat = lat, lon = lon) %>% 
+        generate_url() %>% 
+        retrieve_data() %>% 
+        read_nc2list(dims = 'T') %>% 
+        process_date() %>% 
+        as_data_frame()
+}
+site1_temp <- ncep_temp(43.63, -89.76)
+site1_temp
+site2_temp <- ncep_temp(71.27, -156.65)
+site2_temp
+```
+
+We can use some `tidyverse` magic to efficiently extend this to a bunch of sites.
+
+First, create a `tibble` containing site information.
+
+```{r coords_df}
+coords_df <- tribble(
+    ~site_id, ~lat, ~lon,
+    1, 43.63330,  -89.75830,
+    2, 71.27576, -156.64139,
+    3, -2.85000,  -54.96667,
+    4, 33.52174, -116.15635,
+    5, 32.81471, -115.44200,
+    6, 29.70000,  -82.16670,
+    7, 42.49500,  -71.79810,
+    8, 42.53100,  -72.19000,
+    9, 45.22220,  -68.73560,
+    10, 47.47000,   -0.56000
+    )
+coords_df
+```
+
+Then, use the `purrr::map2` function to map each site's latitude and longitude to our new `ncep_temp` function.
+
+```{r clim_data, message=FALSE}
+temp_data <- coords_df %>% 
+    mutate(temp_dat = map2(lat, lon, ncep_temp))
+temp_data
+```
+
+Note that the temperature data is stored as a nested `tibble`.
+Read more about nested `tibbles` in the excellent book [R for Data Science](http://r4ds.had.co.nz/many-models.html) by Garrett Grolemund and Hadley Wickham. 
+
+Now, let's `unnest` this data and plot it.
+
+```{r unnest}
+temp_data_unnested <- unnest(temp_data)
+ggplot(temp_data_unnested) + 
+    aes(x = date, y = temp) +
+    geom_line(color = 'grey60') + 
+    geom_smooth() + 
+    facet_wrap(~site_id, scales = 'free_y')
+```
+
+It may be more instructive to look at some summary statistics.
+To make this plot a little easier to look at, let's filter it down to just three of the sites.
+
+```{r summarize}
+summaries <- temp_data_unnested %>% 
+    mutate(year = lubridate::year(date)) %>% 
+    filter(year < 2017) %>% 
+    group_by(year, site_id) %>% 
+    summarize_at(vars(temp), funs(mean, min, max))
+summaries
+ggplot(summaries %>% 
+       gather(stat, value, mean, min, max) %>% 
+       filter(site_id %in% c(3, 6, 10))) + 
+    aes(x = year, y = value) + 
+    geom_line() + 
+    geom_smooth() + 
+    facet_wrap(~site_id + stat, scales = 'free', ncol = 3)
+```
