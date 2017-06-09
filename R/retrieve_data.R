@@ -1,8 +1,6 @@
 #' @export
 retrieve_data <- function(url_string, out_file = tempfile()) {
-    url_suffix <- 'data.nc'
-    full_url <- generate_url(c(url_string, url_suffix))
-    download.file(full_url, out_file)
+    download.file(URLencode(url_string), out_file)
     return(out_file)
 }
 

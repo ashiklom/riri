@@ -12,7 +12,9 @@ filter_list2string <- function(filter_list) {
 }
 
 #' @export
-generate_url <- function(url_string) {
-    full_url <- paste(url_string, collapse = '/')
+generate_url <- function(url_string, returntype = 'ncdf4') {
+    return_type <- returntype(returntype)
+    url_full_string <- c(url_string, return_type)
+    full_url <- paste(url_full_string, collapse = '/')
     return(full_url)
 }

@@ -10,7 +10,7 @@ ncep_point <- function(lat, lon, varname) {
     base_url() %>% 
         ncep_var(varname) %>% 
         filter_point(lat = lat, lon = lon) %>% 
-        generate_url() %>% 
+        generate_url('ncdf4') %>% 
         retrieve_data() %>% 
         read_nc2list(dims = 'T') %>% 
         process_date()
