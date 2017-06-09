@@ -1,9 +1,12 @@
 #' @export
 returntype <- function(type, ...) {
-    if (type == 'ncdf4') {
+    type <- tolower(type)
+    if (type %in% c('ncdf4', 'ncdf', 'netcdf')) {
         return('data.nc')
-    } else if (type == 'table') {
+    } else if (type %in% c('table', 'tsv')) {
         return(returntype_table(...))
+    } else if (type == 'value') {
+        return(returntype_value(...))
     } else {
         stop('Unkonwn return type "', type, '".')
     }
@@ -23,5 +26,11 @@ returntype_table <- function(table_opts = NULL) {
     table_suffix <- 'T+exch/2+ncoltable.html'
     out <- paste(table_suffix, table_opts_string, sep = '?')
     return(out)
+}
+
+#' @export
+returntype_value <- function(table_opts = NULL) {
+    base_string <- "ngridtable+table-+skipanyNaN+1+-table+.html"
+    return(base_string)
 }
 
