@@ -1,9 +1,21 @@
+#' Download file from URL
+#'
+#' Uses [utils::download.file()] to download file from an IRIDL URL, and 
+#' returns the file name.
+#'
+#' @param url_string Properly formatted IRIDL URL. See [expert2url()].
+#' @inheritParams utils::download.file
+#' @param ... Additional arguments to [utils::download.file()]
 #' @export
-retrieve_data <- function(url_string, out_file = tempfile()) {
-    download.file(URLencode(url_string), out_file)
-    return(out_file)
+retrieve_data <- function(url_string, destfile = tempfile(), ...) {
+    download.file(URLencode(url_string), destfile = destfile, ...)
+    out_file
 }
 
+#' Read all variables from NetCDF file to list
+#'
+#' @param filename Name of file to read
+#' @param dims Vector or list of NetCDF dimensions to read
 #' @export
 read_nc2list <- function(filename, dims) {
     ncfile <- ncdf4::nc_open(filename)
@@ -15,15 +27,17 @@ read_nc2list <- function(filename, dims) {
     vars_list <- lapply(var_names, function(x) read_ncvar(ncfile, x, TRUE))
     names(vars_list) <- var_names
 
-    out_list <- c(dims_list, vars_list)
-    return(out_list)
+    c(dims_list, vars_list)
 }
 
-#' @export
-read_ncvar <- function(ncfile, varname, get_attributes = TRUE) {
-    value <- ncdf4::ncvar_get(ncfile, varname)
+#' Read single variable from NetCDF file
+#'
+#' @inheritParams ncdf4::ncvar_get
+#' @param get_attributes Add attributes from NetCDF variable to returned value
+read_ncvar <- function(nc, varid, get_attributes = TRUE, ...) {
+    value <- ncdf4::ncvar_get(nc, varid, ...)
     if (get_attributes) {
         attributes(value) <- ncdf4::ncatt_get(ncfile, varname)
     }
-    return(value)
+    value
 }

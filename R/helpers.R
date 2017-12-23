@@ -1,20 +1,28 @@
-#' @importFrom magrittr %>%
-
+#' Base URL for IRIDL
+#'
 #' @export
-base_url <- function() {
-    'http://iridl.ldeo.columbia.edu'
-}
+iridl_base_url <- "http://iridl.ldeo.columbia.edu"
 
+#' Concatenate list of filters to a single string
+#'
+#' @param filter_list Vector/List of character filters
+#' @seealso [filter_point()]
 #' @export
 filter_list2string <- function(filter_list) {
-    filter_string <- paste(sapply(seq_along(filter_list), function(x) paste(names(filter_list)[x], filter_list[x], sep = '/')), collapse = '/')
-    return(filter_string)
+  paste_filter <- function(x) {
+    paste(names(filter_list)[x], filter_list[x], sep = "/")
+  }
+  filter_vec <- sapply(seq_along(filter_list), paste_filter)
+  paste(filter_vec, collapse = "/")
 }
 
+#' Generate IRIDL URL for a gven return type
+#'
+#' @inheritParams retrieve_data
+#' @param returntype Type of return
 #' @export
-generate_url <- function(url_string, returntype = 'ncdf4') {
+generate_url <- function(url_string, returntype = "ncdf4") {
     return_type <- returntype(returntype)
     url_full_string <- c(url_string, return_type)
-    full_url <- paste(url_full_string, collapse = '/')
-    return(full_url)
+    paste(url_full_string, collapse = "/")
 }
