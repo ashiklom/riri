@@ -9,7 +9,7 @@
 #' @export
 retrieve_data <- function(url_string, destfile = tempfile(), ...) {
     download.file(URLencode(url_string), destfile = destfile, ...)
-    out_file
+    destfile
 }
 
 #' Read all variables from NetCDF file to list
@@ -37,7 +37,7 @@ read_nc2list <- function(filename, dims) {
 read_ncvar <- function(nc, varid, get_attributes = TRUE, ...) {
     value <- ncdf4::ncvar_get(nc, varid, ...)
     if (get_attributes) {
-        attributes(value) <- ncdf4::ncatt_get(ncfile, varname)
+        attributes(value) <- ncdf4::ncatt_get(nc, varid)
     }
     value
 }
