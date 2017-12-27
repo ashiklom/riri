@@ -6,7 +6,7 @@
 #' @export
 expert2string <- function(code) {
     tws <- trimws(code)
-    gsub("[[:space:]](?![[:alnum:][:space:]]+[)])+", "/", tws, perl = TRUE)
+    gsub("[[:space:]]+(?![[:alnum:][:space:]]+[)])+", "/", tws, perl = TRUE)
 }
 
 #' Convert IRIDL "expert mode" code directly to URL
