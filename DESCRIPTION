@@ -7,9 +7,10 @@ Depends:
     methods
 Imports:
     ncdf4,
-    lubridate
+    lubridate,
+    rvest,
+    magrittr
 Suggests:
-    magrittr,
     testthat
 License: MIT License
 Encoding: UTF-8
