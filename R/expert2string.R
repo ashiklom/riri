@@ -25,7 +25,9 @@ expert2string <- function(code) {
 expert2url <- function(code, return_type = "table", ...) {
     code_string <- expert2string(code)
     comp_url <- paste(iridl_base_url, code_string, sep = "/")
-    if (return_type == "table") {
+    if (is.null(return_type) || return_type == "") {
+        return(comp_url)
+    } else if (return_type == "table") {
         typestring <- returntype_table(...)
         return_url <- paste(comp_url, typestring, sep = "/")
     } else if (return_type == "ncdf") {
