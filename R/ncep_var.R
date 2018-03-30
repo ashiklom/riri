@@ -9,10 +9,9 @@
 #' precipitation
 #' -`"soil_moisture"` (`.GMSM .w`)
 #'
-#' @inheritParams retrieve_data
 #' @param varcode Type of variable.
 #' @export
-ncep_var <- function(url_string, varcode) {
+ncep_var2 <- function(varcode) {
     ncep_base <- c("SOURCES", ".NOAA", ".NCEP", ".CPC")
     accepted_varcodes <- c("air_temperature", "precipitation", "soil_moisture")
     if (!varcode %in% accepted_varcodes) {
@@ -24,5 +23,5 @@ ncep_var <- function(url_string, varcode) {
                       precipitation = c(".PRECL", ".v1p0", ".deg0p5", ".rain"),
                       soil_moisture = c(".GMSM", ".w"),
                       stop())
-    c(url_string, ncep_base, varlist)
+    c(ncep_base, varlist)
 }
