@@ -11,7 +11,7 @@
 #'
 #' @param varcode Type of variable.
 #' @export
-ncep_var2 <- function(varcode) {
+ncep_var <- function(varcode) {
     ncep_base <- c("SOURCES", ".NOAA", ".NCEP", ".CPC")
     accepted_varcodes <- c("air_temperature", "precipitation", "soil_moisture")
     if (!varcode %in% accepted_varcodes) {
