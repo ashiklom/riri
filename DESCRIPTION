@@ -9,7 +9,9 @@ Imports:
     ncdf4,
     lubridate,
     rvest,
-    magrittr
+    magrittr,
+    tibble,
+    purrr
 Suggests:
     testthat
 License: MIT License

@@ -1,5 +1,4 @@
-library(riri)
-library(testthat)
+context("Code string preparation")
 
 string <- "
 SOURCES .NOAA .NCEP .CPC .GHCN_CAMS .gridded .deg0p5 .temp

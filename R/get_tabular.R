@@ -80,10 +80,6 @@ site2expert <- function(sites_df, xvar = ".T") {
   paste(out1, ":a", sep = "\n")
 }
 
-latlon2string <- function(latitude, longitude) {
-  sprintf("X (%f) VALUE Y (%f) VALUE", longitude, latitude)
-}
-
 segment_df <- function(.data, group_size = 5) {
   .data %>%
     dplyr::mutate(.segment_group = 1 + (row_number() - 1) %/% !!group_size) %>%

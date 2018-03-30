@@ -1,44 +1,44 @@
-library(tidyverse)
-library(riri)
-library(ncdf4)
+context("WorldClim extractions work")
 
-worldclim_coord_filter <- function(lat, lon) {
-    x1 <- (lon %/% 30) * 30 + 15
-    x2 <- lon - x1
-    
-    y1 <- (lat %/% 30) * 30 + 15
-    y2 <- lat - y1
+sites <- tibble::tribble(
+  ~site, ~lat, ~lon,
+  "reston", 38.9675, -77.3606,
+  "barrow", 71.2906, -156.7886,
+  "key_west", 24.5551, -81.7800
+)
 
-    vals <- c(X = lon, X2 = x2, Y = lat, Y2 = y2)
+test_that(
+  "Coordinates are converted correctly",
+  {
+    lat <- sites$lat[1]
+    lon <- sites$lon[1]
+    wccoords <- worldclim_coords(lat, lon)
+    expect_equal(wccoords$X, -75)
+    expect_equal(wccoords$X2, -2.3606)
+    expect_equal(wccoords$Y, 45)
+    expect_equal(wccoords$Y2, -6.0325)
+  }
+)
 
-    strings <- sprintf('%f/VALUES', vals)
-    names(strings) <- names(vals)
+test_that(
+  "Single site, single variable extraction works",
+  {
+    latitude <- sites$lat[1]
+    longitude <- sites$lon[1]
+    variable <- "AMT"
+    amt <- get_worldclim_sitevar(latitude, longitude, variable)
+    expect_true(is.data.frame(amt))
+    expect_equal(colnames(amt), "AMT")
+    expect_true(is.numeric(amt$AMT))
+    expect_true(amt$AMT > 0)
+  }
+)
 
-    return(strings)
-}
-
-filter_coord_worldclim <- function(url_string, lat, lon) {
-    filter_list <- worldclim_coord_filter(lat, lon)
-    filter_string <- filter_list2string(filter_list)
-    output <- c(url_string, filter_string)
-    return(output)
-}
-
-worldclim_amt <- function(lat, lon) {
-    full_url <- base_url() %>% 
-        c('SOURCES', '.WORLDCLIM', '.AMT') %>% 
-        filter_coord_worldclim(lat, lon) %>% 
-        generate_url('value')
-    temp <- as.numeric(XML::readHTMLTable(full_url, as.data.frame = FALSE)[[1]][[1]][2])
-    return(temp)
-}
-
-sites <- tribble(
-    ~site, ~lat, ~lon,
-    'reston', 38.9675, -77.3606,
-    'barrow', 71.2906, -156.7886,
-    'key_west', 24.5551, -81.7800
-    ) %>% 
-    mutate(AMT = map2_dbl(lat, lon, worldclim_amt))
-
-print(sites)
+test_that(
+  "Single site, all variable extraction works",
+  {
+    latitude <- sites$lat[1]
+    longitude <- sites$lon[1]
+    wcvars <- get_worldclim_site(latitude, longitude)
+  }
+)

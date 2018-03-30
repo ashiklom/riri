@@ -33,7 +33,7 @@ expert2url <- function(code, return_type = "table", ...) {
     } else if (return_type == "ncdf") {
         typestring <- "data.nc"
     } else {
-        stop("Unknown return type ", return_type)
+      typestring <- return_type
     }
     URLencode(paste(comp_url, typestring, sep = "/"))
 }
