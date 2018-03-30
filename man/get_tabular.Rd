@@ -4,13 +4,15 @@
 \alias{get_tabular}
 \title{Retrieve climate data from a source in tabular form}
 \usage{
-get_tabular(source_string, sites_df, ...)
+get_tabular(source_string, sites_df, group_size = 20, verbose = TRUE, ...)
 }
 \arguments{
 \item{source_string}{An expert mode string or character vector}
 
 \item{sites_df}{A data frame of site information. Must contain columns
 \code{site_name}, \code{latitude}, and \code{longitude}}
+
+\item{group_size}{Size of groups for segmenting data. Default = 20.}
 }
 \value{
 \code{tibble} containing data to be returned
