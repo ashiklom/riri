@@ -7,8 +7,8 @@
 #' @export
 get_tabular <- function(source_string, sites_df, ...) {
   src <- paste(source_string, collapse = " ")
-  site_expert <- site2expert(site_df)
-  nsite <- nrow(site_df)
+  site_expert <- site2expert(sites_df)
+  nsite <- nrow(sites_df)
   all_expert <- expert2string(paste(src, site_expert))
   src_url <- expert2url(all_expert, "")
   file_url <- paste(src_url, ncoltable(nsite), sep = "/")
@@ -36,13 +36,13 @@ ncoltable <- function(nsite) {
   paste0(ntab, "+ncoltable.html?", tabopt_string)
 }
 
-site2expert <- function(site_df, xvar = ".T") {
+site2expert <- function(sites_df, xvar = ".T") {
   stopifnot(
-    is.data.frame(site_df),
-    "latitude" %in% colnames(site_df),
-    "longitude" %in% colnames(site_df)
+    is.data.frame(sites_df),
+    "latitude" %in% colnames(sites_df),
+    "longitude" %in% colnames(sites_df)
   )
-  coord_strings <- purrr::map2_chr(site_df$latitude, site_df$longitude, latlon2string)
+  coord_strings <- purrr::map2_chr(sites_df$latitude, sites_df$longitude, latlon2string)
   firstline <- paste0("a: ", xvar)
   out1 <- paste(c(firstline, coord_strings), collapse = " \n:a: ")
   paste(out1, ":a", sep = "\n")
