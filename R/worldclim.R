@@ -42,6 +42,22 @@ get_worldclim_sitevar <- function(latitude, longitude, variable) {
   out
 }
 
+# Variant that uses NetCDF
+# Not actually that much faster -- main bottleneck is variable access
+get_worldclim_sitevar2 <- function(latitude, longitude, variable) {
+  stopifnot(
+    variable %in% worldclim_vars$label
+  )
+  worldclim_src <- paste0("SOURCES .WORLDCLIM .", variable)
+  wc_coords <- worldclim_coords(latitude, longitude)
+  coord_string <- value_string(!!!wc_coords)
+  expert <- paste(worldclim_src, coord_string)
+  src_url <- expert2url(expert, "dods")
+  nc <- ncdf4::nc_open(src_url)
+  out <- ncdf4::ncvar_get(nc, variable)
+  tibble::tibble(!!variable := out)
+}
+
 #' Convert lat lon coordinates to two-part Worldclim grid
 #'
 #' @param lat Latitude coordinate
