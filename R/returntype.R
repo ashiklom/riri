@@ -16,8 +16,9 @@ returntype <- function(type, ...) {
 
 #' Return a two-column table
 #'
+#' @param timevar Variable to be used for time. Default = "T".
 #' @export
-returntype_table <- function(table_opts = NULL) {
+returntype_table <- function(table_opts = NULL, timevar = "T") {
     default_opts <- list(tabopt.N = 3, tabopt.1 = "ISO8601", tabopt.2 = "numbers", tabopt.3 = "blankNaN",
                          NaNmarker = "", tabtype = "R.tsv", eol = "LF+(unix)", filename = "datafile.tsv")
     if (!is.null(table_opts)) {
@@ -27,7 +28,7 @@ returntype_table <- function(table_opts = NULL) {
     }
     table_opts_char <- sprintf("%s=%s", names(use_opts), unlist(use_opts))
     table_opts_string <- paste0(table_opts_char, collapse = "&")
-    table_suffix <- "T+exch/2+ncoltable.html"
+    table_suffix <- paste0(timevar, "+exch/2+ncoltable.html")
     paste(table_suffix, table_opts_string, sep = "?")
 }
 

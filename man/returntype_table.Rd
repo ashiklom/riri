@@ -4,7 +4,10 @@
 \alias{returntype_table}
 \title{Return a two-column table}
 \usage{
-returntype_table(table_opts = NULL)
+returntype_table(table_opts = NULL, timevar = "T")
+}
+\arguments{
+\item{timevar}{Variable to be used for time. Default = "T".}
 }
 \description{
 Return a two-column table
